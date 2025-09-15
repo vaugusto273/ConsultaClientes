@@ -1,0 +1,20 @@
+:root{--theme-trans:300ms ease;}
+body,
+    .navbar,
+    .dropdown-menu,
+    .card,
+    .table,
+    .list-group-item,
+    .btn,
+    .form-control,
+    .form-select,
+    .alert,
+    .modal-content,
+    .offcanvas,
+    .toast {
+    transition:
+        background-color var(--theme-trans),
+        color var(--theme-trans),
+        border-color var(--theme-trans),
+        box-shadow var(--theme-trans);
+    }
