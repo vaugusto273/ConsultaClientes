@@ -37,6 +37,7 @@ document.getElementById('menuHome').addEventListener('click', e => {
 document.getElementById('menuCreate').addEventListener('click', e => {
     e.preventDefault(); 
     showCard('cardCreate');
+    //Clean inputs
     generalform.forEach(input => {
         const campo = document.getElementById(input.id);
         campo.value = "";
@@ -84,7 +85,7 @@ darkTogglebtn.addEventListener('click', () => {
     updateIcon();
     localStorage.setItem('theme', body.getAttribute('data-bs-theme')); //Salva no cache
 });
-//Tratamento do formulario v1
+//Tratamento do formulario v2
 crudBtn.forEach(btn => {
     btn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -93,12 +94,12 @@ crudBtn.forEach(btn => {
             case 'btn-create':
                 createform.forEach(input =>{
                     const campo = document.getElementById(input.id);
-                    if (input.value.trim() === ""){
-                        campo.classList.remove('is-valid')
-                        campo.classList.add('is-invalid')
+                    if (!input.checkValidity()){
+                        campo.classList.remove('is-valid');
+                        campo.classList.add('is-invalid');
                     }else{
-                        campo.classList.remove('is-invalid')
-                        campo.classList.add('is-valid')
+                        campo.classList.remove('is-invalid');
+                        campo.classList.add('is-valid');
                     }
                 })
                 break;
@@ -106,7 +107,7 @@ crudBtn.forEach(btn => {
                 c = 0
                 readform.forEach(input =>{
                     const campo = document.getElementById(input.id);
-                    if (input.value.trim() === "" ){
+                    if (!input.checkValidity()){
                         c++;
                         if (c == 4){
                             readform.forEach(input =>{
@@ -127,7 +128,7 @@ crudBtn.forEach(btn => {
             case 'btn-update':
                 updateform.forEach(input =>{
                     const campo = document.getElementById(input.id);
-                    if (input.value.trim() === ""){
+                    if (!input.checkValidity()){
                         campo.classList.remove('is-valid')
                         campo.classList.add('is-invalid')
                     }else{
@@ -140,7 +141,7 @@ crudBtn.forEach(btn => {
                 c = 0;
                 removeform.forEach(input =>{
                     const campo = document.getElementById(input.id);
-                    if (input.value.trim() === "" ){
+                    if (!input.checkValidity()){
                         c++
                         if (c == 4){
                             removeform.forEach(input =>{

@@ -63,19 +63,23 @@
 						<form action="">
 							<div class="mb-3">
 								<label for="name-create" class="formlabel">Nome Completo*</label>
-								<input type="text" class="form-control form-create" id="name-create" name="NomeCompleto" required/>
++ 								<input type="text" class="form-control form-create" id="name-create" name="NomeCompleto" pattern="^[A-Za-zÀ-ÖØ-öø-ÿ\s]{3,150}$" required/>
+								<div class="invalid-feedback">Digite um nome válido.</div>
 							</div>
 							<div class="mb-3">
 								<label for="mail-create" class="formlabel">Email*</label>
-								<input type="text" class="form-control form-create" id="mail-create" name="Email" required/>
+								<input type="email" class="form-control form-create" id="mail-create" name="Email" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required/>
+								<div class="invalid-feedback">Digite um e-mail válido.</div>
 							</div>
 							<div class="mb-3">
 								<label for="tel-create" class="formlabel">Telefone*</label>
-								<input type="text" class="form-control form-create" id="tel-create" name="Telefone" required/>
+								<input type="tel" class="form-control form-create" id="tel-create" name="Telefone" pattern="^\d{10,11}$" required/>
+								<div class="invalid-feedback">Digite um telefone válido.</div>
 							</div>
 							<div class="mb-3">
 								<label for="ddn-create" class="formlabel">Data de nascimento*</label>
-								<input type="text" class="form-control form-create" id="ddn-create" name="DataDeNascimento" required/>
+								<input type="date" class="form-control form-create" id="ddn-create" name="DataDeNascimento" pattern="^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$" required/>
+								<div class="invalid-feedback">Digite uma data de nascimento válido.</div>
 							</div>
 							<button class="btn btn-primary crud-btn" id="btn-create">Criar</button>
 						</form>
@@ -89,19 +93,23 @@
 						<form action="">
 							<div class="mb-3">
 								<label for="name-read" class="formlabel">Nome Completo</label>
-								<input type="text" class="form-control form-read" id="name-read" name="NomeCompleto"/>
+								<input type="text" class="form-control form-read" id="name-read" name="NomeCompleto" pattern="^[A-Za-zÀ-ÖØ-öø-ÿ\s]{3,150}$" required>
+								<div class="invalid-feedback">Digite um nome válido.</div>
 							</div>
 							<div class="mb-3">
 								<label for="mail-read" class="formlabel">Email</label>
-								<input type="text" class="form-control form-read" id="mail-read" name="Email"/>
+								<input type="email" class="form-control form-read" id="mail-read" name="Email" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required/>
+								<div class="invalid-feedback">Digite um e-mail válido.</div>
 							</div>
 							<div class="mb-3">
 								<label for="tel-read" class="formlabel">Telefone</label>
-								<input type="text" class="form-control form-read" id="tel-read" name="Telefone"/>
+								<input type="tel" class="form-control form-read" id="tel-read" name="Telefone" pattern="^\d{10,11}$" required/>
+								<div class="invalid-feedback">Digite um telefone válido.</div>
 							</div>
 							<div class="mb-3">
 								<label for="ddn-read" class="formlabel">Data de nascimento</label>
-								<input type="text" class="form-control form-read" id="ddn-read" name="DataDeNascimento"/>
+								<input type="date" class="form-control form-read" id="ddn-read" name="DataDeNascimento" pattern="^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$" required/>
+								<div class="invalid-feedback">Digite uma data de nascimento válido.</div>
 							</div>
 							<button class="btn btn-primary crud-btn" id="btn-read">Procurar</button>
 						</form>
@@ -115,19 +123,23 @@
 						<form action="">
 							<div class="mb-3">
 								<label for="name-update" class="formlabel">Nome Completo*</label>
-								<input type="text" class="form-control form-update" id="name-update" name="NomeCompleto" required/>
+								<input type="text" class="form-control form-update" id="name-update" name="NomeCompleto" pattern="^[A-Za-zÀ-ÖØ-öø-ÿ\s]{3,150}$" required/>
+								<div class="invalid-feedback">Digite um nome válido.</div>
 							</div>
 							<div class="mb-3">
 								<label for="mail-update" class="formlabel">Email*</label>
-								<input type="text" class="form-control form-update" id="mail-update" name="Email" required/>
+								<input type="email" class="form-control form-update" id="mail-update" name="Email" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required/>
+								<div class="invalid-feedback">Digite um e-mail válido.</div>
 							</div>
 							<div class="mb-3">
 								<label for="tel-update" class="formlabel">Telefone*</label>
-                                <input type="text" class="form-control form-update" id="tel-update" name="Telefone" required/>
+                                <input type="tel" class="form-control form-update" id="tel-update" name="Telefone" pattern="^\d{10,11}$" required/>
+								<div class="invalid-feedback">Digite um telefone válido.</div>
 							</div>
 							<div class="mb-3">
 								<label for="ddn-update" class="formlabel">Data de nascimento*</label>
-                                <input type="text" class="form-control form-update" id="ddn-update" name="DataDeNascimento" required/>
+                                <input type="date" class="form-control form-update" id="ddn-update" name="DataDeNascimento" pattern="^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$" required/>
+								<div class="invalid-feedback">Digite uma data de nascimento válido.</div>
 							</div>
 							<button class="btn btn-primary crud-btn" id="btn-update">Procurar</button>
 						</form>
@@ -141,19 +153,23 @@
 						<form action="">
 							<div class="mb-3">
 								<label for="name-remove" class="formlabel">Nome Completo</label>
-                                <input type="text" class="form-control form-remove" id="name-remove" name="NomeCompleto"/>
+                                <input type="text" class="form-control form-remove" id="name-remove" name="NomeCompleto"  pattern="^[A-Za-zÀ-ÖØ-öø-ÿ\s]{3,150}$" required/>
+								<div class="invalid-feedback">Digite um nome válido.</div>
 							</div>
 							<div class="mb-3">
 								<label for="mail-remove" class="formlabel">Email</label>
-                                <input type="text" class="form-control form-remove" id="mail-remove" name="Email"/>
+                                <input type="email" class="form-control form-remove" id="mail-remove" name="Email" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required/>
+								<div class="invalid-feedback">Digite um e-mail válido.</div>
 							</div>
 							<div class="mb-3">
 								<label for="tel-remove" class="formlabel">Telefone</label>
-                                <input type="text" class="form-control form-remove" id="tel-remove" name="Telefone"/>
+                                <input type="tel" class="form-control form-remove" id="tel-remove" name="Telefone" pattern="^\d{10,11}$" required/>
+								<div class="invalid-feedback">Digite um telefone válido.</div>
 							</div>
 							<div class="mb-3">
 								<label for="ddn-remove" class="formlabel">Data de nascimento</label>
-                                <input type="text" class="form-control form-remove" id="ddn-remove" name="DataDeNascimento"/>
+                                <input type="date" class="form-control form-remove" id="ddn-remove" name="DataDeNascimento" pattern="^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$" required/>
+								<div class="invalid-feedback">Digite uma data de nascimento válido.</div>
 							</div>
 							<button class="btn btn-primary crud-btn" id="btn-remove">Procurar</button>
 						</form>
