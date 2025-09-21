@@ -123,7 +123,30 @@ switch($method){
         }
         break;
     case 'DELETE':
-        break;
+        $id = $_GET['id'] ?? null;
+        if (!$id) {
+            http_response_code(400);
+            echo json_encode(['error' => 'ID é obrigatório']);
+            break;
+        }
+
+        try {
+            $stmt = $pdo->prepare("DELETE FROM clients WHERE id = :id");
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+
+            if ($stmt->rowCount() === 0) {
+                http_response_code(404);
+                echo json_encode(['error' => 'Cliente não encontrado']);
+            } else {
+                echo json_encode(['success' => true, 'deleted_id' => $id]);
+            }
+        } catch (Throwable $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'DB error', 'message' => $e->getMessage()]);
+        }
+    break;
+
     default:
         http_response_code(405);
         echo json_encode(['error' => 'Método não permitido']);
