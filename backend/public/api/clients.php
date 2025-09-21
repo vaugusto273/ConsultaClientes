@@ -58,6 +58,7 @@ switch($method){
         if (!preg_match('/^\d{10,11}$/', $phone)) $error[] = ['code' => 203, 'field' => 'phone',   'message' => 'Invalid Phone'];
         if (!preg_match('/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/', $birthdate)) $error[] = ['code' => 204, 'field' => 'birthdate',  'message' => 'Invalid Birth Date'];
         if ($error) {
+            http_response_code(422);
             echo json_encode(['error' => $error], JSON_UNESCAPED_UNICODE);
             exit;
         }
@@ -78,8 +79,48 @@ switch($method){
         }
         break;
     case 'PUT':
-        break;
-    case 'PATCH':
+        $id = $_GET['id'] ?? null;
+        if (!$id){
+            http_response_code(400);
+            echo json_encode(['error' => 'ID é obrigatório']);
+            break;
+        }
+        $raw = file_get_contents("php://input");
+        $input = json_decode($raw, true) ?? [];
+
+        $name = trim($input['name'] ?? '');
+        $email = trim($input['email'] ?? '');
+        $phone = trim($input['phone'] ?? '');
+        $birthdate = trim($input['birthdate'] ?? '');
+
+        if (!preg_match('/^[A-Za-zÀ-ÖØ-öø-ÿ\s]{3,150}$/', $name)) $error[] = ['code' => 201, 'field' => 'name',    'message' => 'Invalid Name'];
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $error[] = ['code' => 202, 'field' => 'email',   'message' => 'Invalid Email'];
+        if (!preg_match('/^\d{10,11}$/', $phone)) $error[] = ['code' => 203, 'field' => 'phone',   'message' => 'Invalid Phone'];
+        if (!preg_match('/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/', $birthdate)) $error[] = ['code' => 204, 'field' => 'birthdate',  'message' => 'Invalid Birth Date'];
+        if ($error) {
+            http_response_code(422);
+            echo json_encode(['error' => $error], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+        try{
+            $stmt = $pdo->prepare("UPDATE clients SET name=:name,email=:email,phone=:phone,birthdate=:birthdate WHERE id=
+            :id");
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->bindParam(':name', $name);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':phone', $phone);
+            $stmt->bindParam(':birthdate', $birthdate);
+            $stmt->execute();
+            
+            if ($stmt->rowCount() === 0) {
+                http_response_code(404);
+                echo json_encode(['error'=>'Cliente não encontrado']);
+            } else {
+                echo json_encode(['success'=>true,'updated_id'=>$id]);
+            }
+        } catch (Throwable $e){
+            echo json_encode(['error'=>'DB error','message'=>$e->getMessage()]);
+        }
         break;
     case 'DELETE':
         break;
