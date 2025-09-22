@@ -13,6 +13,7 @@ const API_BASE = "http://localhost:8080";
 const container = document.getElementById("output-table");
 const v = (id) => (document.getElementById(id)?.value || '').trim();
 let lastID;
+const LIMIT = 10;
 
 //Functions
 function updateIcon() {
@@ -33,7 +34,9 @@ async function submitForm(json) {
 	switch (json.method) {
 		case "GET":
 			try {
+				const currentPage = Number(json.page || container.dataset.page || 1);
 				//Caso qualquer uma das caracteristicas seja null, undefined ou similar, faz com que vire uma string vazia
+				json.page = json.page ?? "";
 				json.id = json.id ?? "";
 				json.name = json.name ?? "";
 				json.email = json.email ?? "";
@@ -41,12 +44,13 @@ async function submitForm(json) {
 				json.birthdate = json.birthdate ?? "";
 				//Configurar a resposta
 				const res = await fetch(
-					`${API_BASE}/api/clients.php?id=${json.id}&name=${json.name}&email=${json.email}&phone=${json.phone}&birthdate=${json.birthdate}`
+					`${API_BASE}/api/clients.php?page=${json.page}&id=${json.id}&name=${json.name}&email=${json.email}&phone=${json.phone}&birthdate=${json.birthdate}`
 				);
 				// Dados recebidos dependendo dos parâmetros
 				const { data } = await res.json();
 				//Configuração da tabela
 				container.innerHTML = "";
+				container.dataset.page = String(currentPage);
 				//Cabeçalho da tabela
 				let table = `
                     <table class='table'>
@@ -77,11 +81,48 @@ async function submitForm(json) {
 				table += `
                 </table>
                 <div id="pager" class="d-flex gap-2 align-items-center mt-3">
-				    <button id="btnPrev" class="btn btn-outline-secondary btn-sm">« Anterior</button>
-				    <span id="pageInfo" class="small"></span>
-				    <button id="btnNext" class="btn btn-outline-secondary btn-sm">Próxima »</button>
-			    </div>`;
+					<button id="btnPrev" class="btn btn-outline-secondary btn-sm">« Anterior</button>
+					<span id="pageInfo" class="small"></span>
+					<button id="btnNext" class="btn btn-outline-secondary btn-sm">Próxima »</button>
+				</div>`;
 				container.innerHTML = table;
+
+				const btnPrev = document.getElementById('btnPrev');
+				const btnNext = document.getElementById('btnNext');
+
+				 // Prev desabilita na página 1
+				btnPrev.disabled = currentPage === 1;
+				// Next desabilita se voltou menos que o LIMIT (provável última página)
+				btnNext.disabled = data.length < LIMIT;
+
+				btnPrev.onclick = function (e) {
+					e.preventDefault();
+					if (currentPage > 1) {
+						submitForm({
+						method: "GET",
+						page: currentPage - 1,
+						name: json.name,
+						email: json.email,
+						phone: json.phone,
+						birthdate: json.birthdate
+						});
+					}
+					};
+
+				btnNext.onclick = function (e) {
+					e.preventDefault();
+					if (data.length === LIMIT) {
+						submitForm({
+						method: "GET",
+						page: currentPage + 1,
+						name: json.name,
+						email: json.email,
+						phone: json.phone,
+						birthdate: json.birthdate
+						});
+					}
+					};
+
 				container.addEventListener("click", async (e) => {
 					if (e.target.classList.contains("goUpdate")) {
 						const Updateid = e.target.value;
@@ -107,8 +148,8 @@ async function submitForm(json) {
 					}
 					if (e.target.classList.contains("goRemove")) {
 						const Removeid = e.target.value;
-                        showCard("cardRemove");
-                        try {
+						showCard("cardRemove");
+						try {
 							lastID = Removeid;
 							const res = await fetch(`${API_BASE}/api/clients.php?id=${Removeid}`);
 							const { data } = await res.json();
