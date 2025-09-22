@@ -16,37 +16,50 @@ $error = [];
 
 switch($method){
     case 'GET':
-        $q     = isset($_GET['q']) ? trim($_GET['q']) : '';
+        $name = trim($_GET['name'] ?? '');
+        $email = trim($_GET['email'] ?? '');
+        $phone = trim($_GET['phone'] ?? '');
+        $birthdate = trim($_GET['birthdate'] ?? '');
+
         $page  = max(1, (int)($_GET['page'] ?? 1));
         $limit = min(50, max(1, (int)($_GET['limit'] ?? 10)));
         $offset = ($page - 1) * $limit;
-        if ($q === '') {
-            $sql = "SELECT id,name,email,phone,birthdate
-                    FROM clients
-                    ORDER BY id ASC
-                    LIMIT :limit OFFSET :offset";
-            $stmt = $pdo->prepare($sql);
-        } else {
-            $sql = "SELECT id,name,email,phone,birthdate
-                    FROM clients
-                    WHERE name LIKE :q OR email LIKE :q OR phone LIKE :q
-                    ORDER BY id ASC
-                    LIMIT :limit OFFSET :offset";
-            $stmt = $pdo->prepare($sql);
-            $like = "%{$q}%";
-            $stmt->bindParam(':q', $like, PDO::PARAM_STR);
+
+        $conds = [];
+        $params = [];
+
+        if ($name !== ''){ $conds[] = 'name LIKE :name';$params[':name'] = "%{$name}%"; }
+        if ($email !== ''){ $conds[] = 'email LIKE :email';$params[':email'] = "%{$email}%"; }
+        if ($phone !== ''){ $conds[] = 'phone LIKE :phone';$params[':phone'] = "%{$phone}%"; }
+        if ($birthdate !== '') { $conds[] = 'birthdate LIKE :birthdate'; $params[':birthdate'] = "%{$birthdate}%"; }
+
+        $where = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
+
+        $sql = "SELECT id,name,email,phone,birthdate
+                FROM clients
+                $where
+                ORDER BY id ASC
+                LIMIT :limit OFFSET :offset";
+
+        $stmt = $pdo->prepare($sql);
+
+        foreach ($params as $k => $v) {
+            $stmt->bindValue($k, $v, PDO::PARAM_STR);
         }
-        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+
+        $stmt->bindValue(':limit',  $limit,  PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
         $stmt->execute();
         $rows = $stmt->fetchAll();
 
         echo json_encode([
-            'data' => $rows,
-            'page' => $page,
+            'data'  => $rows,
+            'page'  => $page,
             'limit' => $limit,
-            ], JSON_UNESCAPED_UNICODE);
-        break;
+        ], JSON_UNESCAPED_UNICODE);
+    break;
+
     case 'POST':
         $name = isset($_POST['name']) ? trim($_POST['name']): '';
         $email = isset($_POST['email']) ? trim($_POST['email']): '';

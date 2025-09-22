@@ -9,6 +9,7 @@ const readform = document.querySelectorAll('.form-read');
 const updateform = document.querySelectorAll('.form-update');
 const removeform = document.querySelectorAll('.form-remove');
 const generalform = document.querySelectorAll('.form-control');
+const API_BASE = 'http://localhost:8080';
 
 //Functions
 function updateIcon() { //Função para dar update no icone
@@ -20,6 +21,53 @@ function showCard(id){
     if (id){
         document.getElementById(id).classList.remove('d-none');
         document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+async function submitForm(json){
+    switch (json.method){
+        case 'GET':
+            try{
+                console.log(`${API_BASE}/api/clients.php?q=${json.name}`)
+                const res = await fetch(`${API_BASE}/api/clients.php?q=${json.name}`);
+                const { data } = await res.json();
+
+                const container = document.getElementById('output-table');
+                container.innerHTML = '';
+                let table = `
+                    <table class='table'>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone Number</th>
+                            <th>Birth date</th>
+                        </tr>`;
+                data.forEach(c => {
+                    table += `
+                    <tr>
+                        <td>${c.id}</td>
+                        <td>${c.name}</td>
+                        <td>${c.email}</td>
+                        <td>${c.phone}</td>
+                        <td>${c.birthdate}</td>
+                    </tr>
+                    `;
+                });
+                table +=`</table>`
+                container.innerHTML = table;
+            }catch(err){
+                console.error(err);
+                alert('Falha ao listar: ' + err.message);
+            }
+            break;
+        case 'POST':
+            break;
+        case 'PUT':
+            break;
+        case 'DELETE':
+            break;
+        default:
+            console.warn('Método não suportado:', json.method)
     }
 }
 // EventListener
@@ -111,17 +159,12 @@ crudBtn.forEach(btn => {
                         c++;
                         if (c == 4){
                             readform.forEach(input =>{
-                                const campo = document.getElementById(input.id);
-                                campo.classList.remove('is-valid');
-                                campo.classList.add('is-invalid');
-                            })
-                        }else{
-                            campo.classList.add('is-valid');
-                            campo.classList.remove('is-invalid');
-                        }
+                                submitForm({method : 'GET', name:'ana'});
+                            })}
                     }else{
                         campo.classList.remove('is-invalid');
                         campo.classList.add('is-valid');
+                        submitForm({method : 'GET', name:'ana'});
                     }
                 })
                 break;
