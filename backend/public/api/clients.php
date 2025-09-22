@@ -5,7 +5,7 @@ require __DIR__. '/../../config/db.php';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: ' . ($config['cors'] ?? '*'));
-header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
@@ -20,6 +20,7 @@ switch($method){
         $email = trim($_GET['email'] ?? '');
         $phone = trim($_GET['phone'] ?? '');
         $birthdate = trim($_GET['birthdate'] ?? '');
+        $id = trim($_GET['id'] ?? '');
 
         $page  = max(1, (int)($_GET['page'] ?? 1));
         $limit = min(50, max(1, (int)($_GET['limit'] ?? 10)));
@@ -28,6 +29,7 @@ switch($method){
         $conds = [];
         $params = [];
 
+        if ($id !== ''){ $conds[] = 'id = :id';$params[':id'] = $id; }
         if ($name !== ''){ $conds[] = 'name LIKE :name';$params[':name'] = "%{$name}%"; }
         if ($email !== ''){ $conds[] = 'email LIKE :email';$params[':email'] = "%{$email}%"; }
         if ($phone !== ''){ $conds[] = 'phone LIKE :phone';$params[':phone'] = "%{$phone}%"; }
