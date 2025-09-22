@@ -1,5 +1,5 @@
 <?php
-
+// Configurações
 $config = require __DIR__.'/../../config/env.php';
 require __DIR__. '/../../config/db.php';
 
@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 $method = $_SERVER['REQUEST_METHOD'];
 
 $error = [];
-
+// Tratamento dos métodos
 switch($method){
     case 'GET':
         $name = trim($_GET['name'] ?? '');
@@ -67,7 +67,7 @@ switch($method){
         $email = isset($_POST['email']) ? trim($_POST['email']): '';
         $phone = isset($_POST['phone']) ? trim($_POST['phone']): '';
         $birthdate = isset($_POST['birthdate']) ? trim($_POST['birthdate']): '';
-        
+        // Usa Regex para descobrir se o valor recebido é válido
         if (!preg_match('/^[A-Za-zÀ-ÖØ-öø-ÿ\s]{3,150}$/', $name)) $error[] = ['code' => 201, 'field' => 'name',    'message' => 'Invalid Name'];
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $error[] = ['code' => 202, 'field' => 'email',   'message' => 'Invalid Email'];
         if (!preg_match('/^\d{10,11}$/', $phone)) $error[] = ['code' => 203, 'field' => 'phone',   'message' => 'Invalid Phone'];
@@ -80,6 +80,7 @@ switch($method){
 
         try{
             $stmt = $pdo->prepare("INSERT INTO clients (name,email,phone,birthdate) VALUES (:name,:email,:phone,:birthdate)");
+            // Mapeia no prepare os parâmetros para a query SQL
             $stmt->bindParam(':name', $name);
             $stmt->bindParam(':email', $email);
             $stmt->bindParam(':phone', $phone);
@@ -100,18 +101,20 @@ switch($method){
             echo json_encode(['error' => 'ID é obrigatório']);
             break;
         }
+        // Pega o conteúdo
         $raw = file_get_contents("php://input");
         $input = json_decode($raw, true) ?? [];
-
+        // Formata os inputs
         $name = trim($input['name'] ?? '');
         $email = trim($input['email'] ?? '');
         $phone = trim($input['phone'] ?? '');
         $birthdate = trim($input['birthdate'] ?? '');
-
+        // Validação com regex
         if (!preg_match('/^[A-Za-zÀ-ÖØ-öø-ÿ\s]{3,150}$/', $name)) $error[] = ['code' => 201, 'field' => 'name',    'message' => 'Invalid Name'];
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $error[] = ['code' => 202, 'field' => 'email',   'message' => 'Invalid Email'];
         if (!preg_match('/^\d{10,11}$/', $phone)) $error[] = ['code' => 203, 'field' => 'phone',   'message' => 'Invalid Phone'];
         if (!preg_match('/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/', $birthdate)) $error[] = ['code' => 204, 'field' => 'birthdate',  'message' => 'Invalid Birth Date'];
+        // Tratamento de erro
         if ($error) {
             http_response_code(422);
             echo json_encode(['error' => $error], JSON_UNESCAPED_UNICODE);

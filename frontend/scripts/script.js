@@ -35,23 +35,23 @@ async function submitForm(json) {
 		case "GET":
 			try {
 				const currentPage = Number(json.page || container.dataset.page || 1);
-				//Caso qualquer uma das caracteristicas seja null, undefined ou similar, faz com que vire uma string vazia
+				// Caso qualquer uma das caracteristicas seja null, undefined ou similar, faz com que vire uma string vazia
 				json.page = json.page ?? "";
 				json.id = json.id ?? "";
 				json.name = json.name ?? "";
 				json.email = json.email ?? "";
 				json.phone = json.phone ?? "";
 				json.birthdate = json.birthdate ?? "";
-				//Configurar a resposta
+				// Faz a configuração do GET
 				const res = await fetch(
 					`${API_BASE}/api/clients.php?page=${json.page}&id=${json.id}&name=${json.name}&email=${json.email}&phone=${json.phone}&birthdate=${json.birthdate}`
 				);
 				// Dados recebidos dependendo dos parâmetros
 				const { data } = await res.json();
-				//Configuração da tabela
+				// Configuração da tabela
 				container.innerHTML = "";
 				container.dataset.page = String(currentPage);
-				//Cabeçalho da tabela
+				// Cabeçalho da tabela
 				let table = `
                     <table class='table'>
                         <tr>
@@ -62,7 +62,7 @@ async function submitForm(json) {
                             <th>Birth date</th>
                             <th>Actions</th>
                         </tr>`;
-				//Mostra no HTML cada um dos resultados condizentes a pesquisa
+				// Mostra no HTML cada um dos resultados condizentes a pesquisa
 				data.forEach((c) => {
 					table += `
                     <tr>
@@ -85,16 +85,17 @@ async function submitForm(json) {
 					<span id="pageInfo" class="small"></span>
 					<button id="btnNext" class="btn btn-outline-secondary btn-sm">Próxima »</button>
 				</div>`;
+				// Atualiza o container para renderizar a tabela
 				container.innerHTML = table;
-
+				// Mapeia os botões de páginação
 				const btnPrev = document.getElementById('btnPrev');
 				const btnNext = document.getElementById('btnNext');
 
-				 // Prev desabilita na página 1
+				// Desabilita o botão de voltar se estiver na página 1
 				btnPrev.disabled = currentPage === 1;
-				// Next desabilita se voltou menos que o LIMIT (provável última página)
+				// Desabilita o botão de avançar se a quantidades de dados recebidos for menos do que o LIMIT
 				btnNext.disabled = data.length < LIMIT;
-
+				// Vai para a página anterior
 				btnPrev.onclick = function (e) {
 					e.preventDefault();
 					if (currentPage > 1) {
@@ -108,7 +109,7 @@ async function submitForm(json) {
 						});
 					}
 					};
-
+				// Vai para a próxima página
 				btnNext.onclick = function (e) {
 					e.preventDefault();
 					if (data.length === LIMIT) {
@@ -122,9 +123,10 @@ async function submitForm(json) {
 						});
 					}
 					};
-
+					// EventListener para ir para o card de Update e Delete
 				container.addEventListener("click", async (e) => {
 					if (e.target.classList.contains("goUpdate")) {
+						// Pega o valor da classe e que foi clicada
 						const Updateid = e.target.value;
 						showCard("cardUpdate");
 						try {
@@ -136,6 +138,7 @@ async function submitForm(json) {
 								alert("Cliente não encontrado");
 								return;
 							}
+							// Garante pegar o primeiro dado que aparecer
 							const cliente = data[0];
 							document.getElementById("name-update").value = cliente.name;
 							document.getElementById("mail-update").value = cliente.email;
@@ -201,6 +204,7 @@ async function submitForm(json) {
 
 				alert("Cliente criado! ID: " + data.id);
 				clearUI();
+				// Mostra o novo usuario adicionado para confirmação dos dados adicionados
 				submitForm({ method: "GET", id: data.id });
 			} catch (err) {
 				console.error(err);
@@ -210,6 +214,7 @@ async function submitForm(json) {
 		case "PUT": {
 			try {
 				const id = json.id ?? lastID;
+				// Verifica se ID foi informado
 				if (!id) {
 					throw new Error("Informe o ID para atualizar.");
 				}
@@ -217,7 +222,7 @@ async function submitForm(json) {
 					throw new Error("Todos os campos são obrigatórios!");
 				}
 
-				// monta URL COM o id na query string
+				// Monta URL COM o id na query string
 				const url = new URL(`${API_BASE}/api/clients.php`);
 				url.searchParams.set("id", id);
 
@@ -227,7 +232,7 @@ async function submitForm(json) {
 					phone: json.phone,
 					birthdate: json.birthdate,
 				};
-
+				// Manda o metódo PUT
 				const res = await fetch(url.toString(), {
 					method: "PUT",
 					headers: { "Content-Type": "application/json" },
@@ -372,14 +377,14 @@ document.getElementById("menuRead").addEventListener("click", (e) => {
 	showCard("cardRead");
 	clearUI();
 });
-
+// Funcionalidade de dark e light mode para a página
 darkTogglebtn.addEventListener("click", () => {
 	const current = body.getAttribute("data-bs-theme"); //Seleciona o atributo dentro do data-bs-theme
 	body.setAttribute("data-bs-theme", current === "dark" ? "light" : "dark"); //Configura o atributo, utilizando um if, se current tiver o valor de dark dentro, então ele vai mudar para light, caso não, ou seja caso seja diferente de dark, ele muda o valor para dark
 	updateIcon();
 	localStorage.setItem("theme", body.getAttribute("data-bs-theme")); //Salva no cache
 });
-//Tratamento do formulario v2
+// Tratamento do formulario v2
 crudBtn.forEach((btn) => {
 	btn.addEventListener("click", (e) => {
 		e.preventDefault();
@@ -387,11 +392,12 @@ crudBtn.forEach((btn) => {
 		switch (btn.id) {
 			case "btn-create": {
 				let ok = true;
+				// Validação
 				createform.forEach((input) => {
 					if (!validateRequired(input)) ok = false;
 				});
 				if (!ok) return;
-
+				//Cria o JSON que vai enviar os dados
 				const payload = {
 					method: "POST",
 					name: v("name-create"),
@@ -403,13 +409,19 @@ crudBtn.forEach((btn) => {
 				break;
 			}
 
-			// READ = vazio -> neutro e lista tudo; preenchido inválido -> marca e não chama
+			// Mostra a tabela do read e procura pelos campos preenchidos se tiver
 			case "btn-read": {
-				showTable("read");
+				const payload = {
+					method: "GET",
+					name: v("name-read"),
+					email: v("mail-read"),
+					phone: v("tel-read"),
+					birthdate: v("ddn-read"),
+				};
+				submitForm(payload)
 				break;
 			}
-			// UPDATE = mesmo comportamento do READ no front (opcional)
-			// Obs: seu backend PUT normalmente precisa de ?id=...; se você tiver um input de id, inclua aqui.
+			// Realiza quase o mesmo comportamento
 			case "btn-update": {
 				let ok = true;
 				updateform.forEach((input) => {
